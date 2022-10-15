@@ -1,4 +1,4 @@
-import React, {useEffect, useReducer,  useContext} from 'react';
+import React, {useEffect, useReducer,  useContext, useRef} from 'react';
 import classes from './Login.module.css';
 
 import Card from '../UI/Card/Card';
@@ -15,6 +15,8 @@ const Login = () => {
     const { email: { valid: emailValid } } = formState;
     const { password: { valid: passwordValid } } = formState;
     const { wholeForm: {valid: formValid }} = formState;
+    const emailRef = useRef();
+    const passwordRef = useRef();
 
     const beforeDestroy = () => {
         console.log('component is destroyed');
@@ -22,7 +24,15 @@ const Login = () => {
 
     const submitHandler = (event) => {
         event.preventDefault();
-        onLogin(formState.email.value, formState.password.value);
+        if(formValid) {
+            onLogin(formState.email.value, formState.password.value);
+        } else if(!emailValid) {
+            emailRef.current?.focus();
+        } else  {
+            passwordRef.current?.focus();
+        }
+
+
     };
 
     useEffect(() => {
@@ -51,16 +61,18 @@ const Login = () => {
                 <Input label="E-Mail"
                        type="email"
                        id="email"
+                       ref={emailRef}
                        valid={emailValid}
                        changeHandler={(value, name, type) => dispatchForm({value, name, type})}/>
                 <Input label="Password"
                        type="password"
                        id="password"
+                       ref={passwordRef}
                        valid={passwordValid}
                        changeHandler={(value, name, type) => dispatchForm({value, name, type})}/>
 
                 <div className={classes.actions}>
-                    <Button type="submit" className={classes.btn} disabled={!formValid}>
+                    <Button type="submit" className={classes.btn}>
                         Login
                     </Button>
                 </div>
